@@ -49,12 +49,15 @@ class Goldqueen(Piece):
         directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
         return self._calculate_moves(position, directions, board)
 
-class Sighducky(Piece):
+class Sighducky(Piece): #2 steps forward, 1 step back
     def __init__(self, owner: str):
         super().__init__("Sighducky", owner)
 
     def valid_moves(self, position: Tuple[int, int], board) -> List[Tuple[int, int]]:
-        directions = [(-1, -1), (-1, 1), (1, -1), (1, 1)]
+        if self.owner == "Player 1":
+            directions = [(1, -1), (2, -2), (1, 1), (2, 2), (-1, -1), (-1, 1)]
+        else:
+            directions = [(-1, -1), (-2, -2), (-1, 1), (-2, 2), (1, -1), (1, 1)]
         return self._calculate_moves(position, directions, board)
 
 class Monkey(Piece):
@@ -62,7 +65,10 @@ class Monkey(Piece):
         super().__init__("Monkey", owner)
 
     def valid_moves(self, position: Tuple[int, int], board) -> List[Tuple[int, int]]:
-        directions = [(-1, -1), (-1, 1), (1, -1), (1, 1)]
+        if self.owner == "Player 1":
+            directions = [(1, 0)] 
+        else:
+            directions = [(-1, 0)] 
         return self._calculate_moves(position, directions, board)
 
 class Charman(Piece):
@@ -79,7 +85,9 @@ class Clefairy(Piece):
 
     def valid_moves(self, position: Tuple[int, int], board) -> List[Tuple[int, int]]:
         if self.owner == "Player 1":
-            directions = [(1, 0)] 
+            directions = [(0, -1), (1, 0), (0, 1)]
         else:
-            directions = [(-1, 0)] 
+            directions = [(0, -1), (-1, 0), (0, 1)]
+        # Player 1: directions = [(1, 0), (2, -1), (2, 0), (2, 1), (3, -2), (3, -1), (3, 0), (3, 1), (3, 2), (4, -1), (4, 1)]
+        # Player 2: directions = [(-1, 0), (-2, -1), (-2, 0), (-2, 1), (-3, -2), (-3, -1), (-3, 0), (-3, 1), (-3, 2), (-4, -1), (-4, 1)]
         return self._calculate_moves(position, directions, board)

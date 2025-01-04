@@ -24,6 +24,9 @@ class Game:
             self.counter = 0
         print(self.counter)
 
+    def get_counter(self) -> int:
+        return self.counter
+
     def check_winner(self):
         print("entered check_winner")
         opponent = "Player 1" if self.current_player == "Player 2" else "Player 2"
