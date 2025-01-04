@@ -4,7 +4,7 @@ from model.piece_initializer import PieceInitializer
 class Board:
     def __init__(self):
         # 3x4 board with initial positions
-        self.grid = [[None for _ in range(5)] for _ in range(7)]
+        self.grid = [[None for _ in range(7)] for _ in range(8)]
         self.piece_initializer = PieceInitializer()
         self.initialize_pieces()
         self.captured_pieces_player1 = []

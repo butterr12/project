@@ -6,11 +6,11 @@ from model.piece import Piece
 class Renderer:
     def __init__(self):
         pygame.init()
-        self.screen = pygame.display.set_mode((500, 700), pygame.RESIZABLE)
+        self.screen = pygame.display.set_mode((600, 700), pygame.RESIZABLE)
         pygame.display.set_caption("Dobutsu Shogi")
         self.images = self.load_piece_images()
-        self.rows = 7  # Number of rows on the board
-        self.cols = 5
+        self.rows = 8  # Number of rows on the board
+        self.cols = 7
         #self.cell_size = 100
 
     def load_piece_images(self):

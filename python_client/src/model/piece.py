@@ -57,6 +57,22 @@ class Sighducky(Piece):
         directions = [(-1, -1), (-1, 1), (1, -1), (1, 1)]
         return self._calculate_moves(position, directions, board)
 
+class Monkey(Piece):
+    def __init__(self, owner: str):
+        super().__init__("Monkey", owner)
+
+    def valid_moves(self, position: Tuple[int, int], board) -> List[Tuple[int, int]]:
+        directions = [(-1, -1), (-1, 1), (1, -1), (1, 1)]
+        return self._calculate_moves(position, directions, board)
+
+class Charman(Piece):
+    def __init__(self, owner: str):
+        super().__init__("Charman", owner)
+
+    def valid_moves(self, position: Tuple[int, int], board) -> List[Tuple[int, int]]:
+        directions = [(-1, -1), (-1, 1), (1, -1), (1, 1)]
+        return self._calculate_moves(position, directions, board)
+
 class Clefairy(Piece):
     def __init__(self, owner: str):
         super().__init__("Clefairy", owner)
