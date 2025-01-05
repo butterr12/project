@@ -29,8 +29,9 @@ class Game:
 
     def check_winner(self):
         print("entered check_winner")
-        if self.checkmate():
-            self.winner = self.current_player
+        opponent = "Player 1" if self.current_player == "Player 2" else "Player 2"
+        if self.checkmate_opp():
+            self.winner = opponent
             self.game_over = True
             print(f"{self.winner} wins by checkmate!")
 
@@ -63,9 +64,27 @@ class Game:
                     all_moves[position] = valid_moves
         return all_moves
 
+    def get_available_pieces_and_moves_opp(self):
+        opponent = "Player 1" if self.current_player == "Player 2" else "Player 2"
+        all_moves = {}
+        for row in range(len(self.board.grid)):
+            for col in range(len(self.board.grid[row])):
+                piece = self.board.grid[row][col]
+                if piece and piece.owner == opponent:
+                    position = (row, col)
+                    valid_moves = piece.valid_moves(position, self.board)
+                    all_moves[position] = valid_moves
+        return all_moves
+
     def print_all_moves(self):
         all_moves = self.get_available_pieces_and_moves()
         print("Valid moves for all pieces of the current player:")
+        for position, moves in all_moves.items():
+            print(f"Piece at {position}: {moves}")
+    
+    def print_all_moves_opp(self):
+        all_moves = self.get_available_pieces_and_moves_opp()
+        print("Valid moves for all pieces of the opp player:")
         for position, moves in all_moves.items():
             print(f"Piece at {position}: {moves}")
 
@@ -97,7 +116,44 @@ class Game:
                         threatened_count += 1
 
         # Print the number of protected pieces threatened for debugging
-        print(f"Number of protected pieces threatened: {threatened_count}")
+        print(f"aNumber of protected pieces threatened: {threatened_count}")
+
+        # Return True if both protected pieces are threatened, otherwise False
+        if threatened_count == len(protected_pieces):
+            return True
+        else:
+            return False
+
+    def checkmate_opp(self):
+        opponent = "Player 1" if self.current_player == "Player 2" else "Player 2"
+
+        # List to store protected opponent pieces (Mime and Charman)
+        protected_pieces = []
+
+        # Iterate over the own's pieces to find Mime and Charman
+        for row in range(len(self.board.grid)):
+            for col in range(len(self.board.grid[row])):
+                piece = self.board.grid[row][col]
+                if piece and piece.owner == self.current_player and piece.protected:
+                    protected_pieces.append((piece, (row, col)))  # Store the piece and its position
+
+        # Get the current player's valid moves
+        opp_player_moves = self.get_available_pieces_and_moves_opp()
+        print(f"protectedpiecesopp: {protected_pieces}")
+
+        # Track how many protected pieces are threatened
+        threatened_count = 0
+
+        for position, moves in opp_player_moves.items():
+            for move in moves:
+                # Check if the move threatens any of the protected pieces
+                for protected_piece, protected_pos in protected_pieces:
+                    if move == protected_pos:
+                        print(f"pos: {position} can move to {move}, which is an opponent's protected {protected_piece.__class__.__name__}.")
+                        threatened_count += 1
+
+        # Print the number of protected pieces threatened for debugging
+        print(f"bNumber of protected pieces threatened opp pov: {threatened_count}")
 
         # Return True if both protected pieces are threatened, otherwise False
         if threatened_count == len(protected_pieces):

@@ -10,6 +10,7 @@ class InputHandler:
         self.valid_moves = [] 
         self.winner_rendered = False 
         self.renderer = Renderer()
+        self.checkmate_count = 0
 
     def handle_event(self, event, game):
         if game.game_over and not self.winner_rendered:
@@ -44,8 +45,8 @@ class InputHandler:
             print(f"row: {grid_x}")
             print(f"col: {grid_y}")
             clicked_piece = game.board.grid[grid_x][grid_y]
-            game.print_all_moves()
-            game.checkmate()
+            game.print_all_moves_opp()
+            game.checkmate_opp()
 
             if clicked_piece and clicked_piece.owner == game.current_player:
                 # reselect new piece if misclicked/change of mind
@@ -63,8 +64,21 @@ class InputHandler:
                     print(grid_y)
                     print("entered movepiece")
                     game.board.move_piece(self.orig_coords, (grid_x, grid_y))
-                    # game.get_available_pieces_and_moves()
-                    game.check_winner()
+                    # game.get_available_pieces_and_moves() # wala na to
+                    if game.checkmate():
+                        self.checkmate_count += 1 
+                    print(f"check_count: {self.checkmate_count}")
+                    # Check winner after opponent's turn
+                    move_counter = game.get_counter()
+                    if game.checkmate_opp() and self.checkmate_count == 1 and move_counter >= 2:
+                        game.check_winner()
+                        print(f"Game over! {game.winner} wins!")
+                    else:
+                        # Switch to opponent's turn
+                        print(f"proceed as usual.")
+                    # game.check_winner()
+                    # Check if the opponent is in checkmate after the move
+                    # previous_player = game.current_player
                     move_status = game.board.move_status()
                     print(f"move_status: {move_status}")
                     if move_status:
