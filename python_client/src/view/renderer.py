@@ -154,12 +154,12 @@ class Renderer:
         # Calculate offsets for centering the board
         board_width = self.cell_size * self.cols
         board_height = self.cell_size * self.rows
-        x_offset = (available_width - board_width) // 2
-        y_offset = (screen_height - board_height) // 2
+        self.x_offset = (available_width - board_width) // 2
+        self.y_offset = (screen_height - board_height) // 2
 
         # Define captured pieces area
-        captured_area_start_x = board_width + x_offset + 20  # Right of the board
-        captured_area_start_y = y_offset
+        captured_area_start_x = board_width + self.x_offset + 20  # Right of the board
+        captured_area_start_y = self.y_offset
 
         # Calculate maximum pieces per row dynamically
         max_pieces_per_row = max(3, min(5, (screen_width - captured_area_start_x) // cell_size))
@@ -221,4 +221,24 @@ class Renderer:
         text_surface = font.render("Play Again", True, (255, 255, 255))  
         text_rect = text_surface.get_rect(center=self.play_again_button_rect.center)
         self.screen.blit(text_surface, text_rect)
+
+    def highlight_valid_moves(self, all_moves, invalid_moves):
+        for (row, col) in all_moves: # get all empty cells yung all moves
+            if (row, col) not in invalid_moves:  # Highlight only valid moves
+                pygame.draw.rect(
+                    self.screen,
+                    (0, 255, 0),  # Green color for valid moves
+                    pygame.Rect(
+                        col * self.cell_size + self.x_offset,
+                        row * self.cell_size + self.y_offset,
+                        self.cell_size,
+                        self.cell_size
+                    ),
+                    3  # Border thickness
+                )
+        pygame.display.flip()
+
+    def clear_highlights(self):
+        self.render_board(board)  # Re-render the board to clear highlights
+        pygame.display.flip()
 

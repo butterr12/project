@@ -130,7 +130,7 @@ class Game:
         # List to store protected opponent pieces (Mime and Charman)
         protected_pieces = []
 
-        # Iterate over the own's pieces to find Mime and Charman
+        # Iterate over the opponent's pieces to find Mime and Charman
         for row in range(len(self.board.grid)):
             for col in range(len(self.board.grid[row])):
                 piece = self.board.grid[row][col]
@@ -141,8 +141,8 @@ class Game:
         opp_player_moves = self.get_available_pieces_and_moves_opp()
         print(f"protectedpiecesopp: {protected_pieces}")
 
-        # Track how many protected pieces are threatened
-        threatened_count = 0
+        # Use a set to track unique threatened positions
+        threatened_positions = set()
 
         for position, moves in opp_player_moves.items():
             for move in moves:
@@ -150,16 +150,18 @@ class Game:
                 for protected_piece, protected_pos in protected_pieces:
                     if move == protected_pos:
                         print(f"pos: {position} can move to {move}, which is an opponent's protected {protected_piece.__class__.__name__}.")
-                        threatened_count += 1
+                        threatened_positions.add(move)  # Add the move to the set
 
-        # Print the number of protected pieces threatened for debugging
-        print(f"bNumber of protected pieces threatened opp pov: {threatened_count}")
+        # Print the number of unique protected pieces threatened for debugging
+        threatened_count = len(threatened_positions)
+        print(f"Number of unique protected pieces threatened (opp pov): {threatened_count}")
 
-        # Return True if both protected pieces are threatened, otherwise False
+        # Return True if all protected pieces are threatened, otherwise False
         if threatened_count == len(protected_pieces):
             return True
         else:
             return False
+
 
     def get_all_valid_moves_protected_pieces(self):
         protected_moves = {
@@ -176,6 +178,15 @@ class Game:
                     protected_moves[piece.owner][position] = valid_moves
         print(f"newfuncprotectedmoves: {protected_moves}")            
         return protected_moves
+
+    def get_all_empty_cells(self):
+        empty_cells_pos = []
+        for row in range(len(self.board.grid)):
+            for col in range(len(self.board.grid[row])):
+                piece = self.board.grid[row][col]
+                if piece is None:
+                    empty_cells_pos.append((row, col))
+        return empty_cells_pos
 
 
     def reset(self):

@@ -111,12 +111,18 @@ class Board:
         x, y = position
         if self.grid[x][y] is not None:
             print("Invalid drop: Cell is already occupied.")
+            #self.invalid_dropping_points.append(position)
             return False
 
         # Check if the drop blocks any protected piece's movement
         opponent_moves = game.get_all_valid_moves_protected_pieces()
-        if position in [move for moves in opponent_moves.values() for move in moves]:
+        # print(f"position: {position}")
+        values = [move for moves in opponent_moves.values() for targets in moves.values() for move in targets]
+        values = set(values)
+        # print(f"Flattened moves: {[move for moves in opponent_moves.values() for targets in moves.values() for move in targets]}")
+        if position in values:
             print("Invalid drop: Cannot block protected pieces' movement.")
+            #self.invalid_dropping_points.append(position)
             return False
 
         # Drop the piece onto the board
@@ -132,6 +138,17 @@ class Board:
         print(f"{player} dropped a piece at {position}.")
         game.increment_counter()
         return True
+
+    def get_invalid_dropping_points(self):
+        """Returns the set of invalid dropping points."""
+        self.invalid_dropping_points = set()  # Initialize as a set
+        # print(f"self.grid: {self.grid}")
+        for row in range(len(self.grid)):
+            for col in range(len(self.grid[0])):
+                piece = self.grid[row][col]
+                if piece and piece.protected:
+                    self.invalid_dropping_points.update(piece.valid_moves((row, col), self))  # Add all valid moves to the set
+        return self.invalid_dropping_points
 
 
     # def check_for_winner(self):

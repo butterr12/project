@@ -77,13 +77,19 @@ class InputHandler:
                             print(f"Deselected piece: {self.selected_piece.name}")
                             self.selected_piece = None  # Deselect the piece
                             self.valid_moves = []  # Clear valid moves
+                            #game.renderer.clear_highlights()
                             return
                         else:
                             if self.selected_piece:  # Reset the previously selected piece
                                 print(f"Deselected piece: {self.selected_piece.name}")
                             print(f"Player 1 selected {piece.name}")
                             self.selected_piece = piece
-                            self.valid_moves = []  # Reset valid moves for captured pieces
+                            # self.valid_moves = []
+                            empty_cells = game.get_all_empty_cells()  
+                            invalid_moves = game.board.get_invalid_dropping_points()
+                            print(empty_cells)
+                            print(invalid_moves)
+                            game.renderer.highlight_valid_moves(empty_cells, invalid_moves)
                             return
 
                 # Check if the click is on Player 2's captured pieces
@@ -94,13 +100,19 @@ class InputHandler:
                             print(f"Deselected piece: {self.selected_piece.name}")
                             self.selected_piece = None  # Deselect the piece
                             self.valid_moves = []  # Clear valid moves
+                            #game.renderer.clear_highlights()
                             return
                         else:
                             if self.selected_piece:  # Reset the previously selected piece
                                 print(f"Deselected piece: {self.selected_piece.name}")
                             print(f"Player 2 selected {piece.name}")
                             self.selected_piece = piece
-                            self.valid_moves = []  # Reset valid moves for captured pieces
+                            # self.valid_moves = []  # Reset valid moves for captured pieces
+                            empty_cells = game.get_all_empty_cells()
+                            print(empty_cells)
+                            invalid_moves = game.board.get_invalid_dropping_points()
+                            print(invalid_moves)
+                            game.renderer.highlight_valid_moves(empty_cells, invalid_moves)
                             return
 
                 # If the click is not on the board or captured pieces, do nothing
