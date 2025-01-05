@@ -71,13 +71,14 @@ class Renderer:
                 )
 
                 # Highlight valid moves
-                if valid_moves and (y, x) in valid_moves:
+                if piece and piece.protected: #lalagyan ko pa ng or opponent.piece.protected
+                    pygame.draw.rect(self.screen, (200, 200, 200), rect, 2)  # Default border for the cell
+                elif valid_moves and (y, x) in valid_moves:
                     pygame.draw.rect(self.screen, (200, 200, 200), rect, 2)
                     inner_rect = rect.inflate(-4, -4)
                     pygame.draw.rect(self.screen, (0, 255, 0), inner_rect)
                 else:
                     pygame.draw.rect(self.screen, (200, 200, 200), rect, 2)
-
                 # Draw the piece if present
                 if piece:
                     image = self.images.get(piece.name)

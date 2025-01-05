@@ -2,12 +2,13 @@ from abc import ABC, abstractmethod
 from typing import List, Tuple
 
 class Piece(ABC):
-    def __init__(self, name: str, owner: str):
+    def __init__(self, name: str, owner: str, protected: bool = False):
         self.name = name
         self.owner = owner
+        self.protected = protected
 
     def __str__(self):
-        return f"{self.name} ({self.owner})"
+        return f"{self.name} ({self.owner}) {'[Protected]' if self.protected else ''}"
 
     @abstractmethod
     def valid_moves(self, position: Tuple[int, int], board) -> List[Tuple[int, int]]:
@@ -19,10 +20,10 @@ class Piece(ABC):
         for dx, dy in directions:
             new_x = position[0] + dx
             new_y = position[1] + dy
-            print(f"pos[0]: {position[0]}, pos[1]: {position[1]}")
-            print(f"new_x: {new_x}, new_y: {new_y}")
-            print(f"board_grid[0]: {len(board.grid[0])}")
-            print(f"board_grid: {len(board.grid)}")
+            # print(f"pos[0]: {position[0]}, pos[1]: {position[1]}")
+            # print(f"new_x: {new_x}, new_y: {new_y}")
+            # print(f"board_grid[0]: {len(board.grid[0])}")
+            # print(f"board_grid: {len(board.grid)}")
             if 0 <= new_x < len(board.grid) and 0 <= new_y < len(board.grid[0]):
                 if board.grid[new_x][new_y] is None or board.grid[new_x][new_y].owner != self.owner:
                     moves.append((new_x, new_y))
@@ -30,7 +31,7 @@ class Piece(ABC):
 
 class Mime(Piece):
     def __init__(self, owner: str):
-        super().__init__("Mime", owner)
+        super().__init__("Mime", owner, protected=True)
 
     def valid_moves(self, position: Tuple[int, int], board) -> List[Tuple[int, int]]:
         # valid moves are:
@@ -73,7 +74,7 @@ class Monkey(Piece):
 
 class Charman(Piece):
     def __init__(self, owner: str):
-        super().__init__("Charman", owner)
+        super().__init__("Charman", owner, protected=True)
 
     def valid_moves(self, position: Tuple[int, int], board) -> List[Tuple[int, int]]:
         directions = [(-1, -1), (-1, 1), (1, -1), (1, 1)]

@@ -44,6 +44,8 @@ class InputHandler:
             print(f"row: {grid_x}")
             print(f"col: {grid_y}")
             clicked_piece = game.board.grid[grid_x][grid_y]
+            game.print_all_moves()
+            game.checkmate()
 
             if clicked_piece and clicked_piece.owner == game.current_player:
                 # reselect new piece if misclicked/change of mind
@@ -61,8 +63,13 @@ class InputHandler:
                     print(grid_y)
                     print("entered movepiece")
                     game.board.move_piece(self.orig_coords, (grid_x, grid_y))
+                    # game.get_available_pieces_and_moves()
                     game.check_winner()
-                    game.increment_counter()
+                    move_status = game.board.move_status()
+                    print(f"move_status: {move_status}")
+                    if move_status:
+                        game.increment_counter()
+                        print(f"hatdog")
                     game.board.print_captured_pieces()
                     self.selected_piece = None
                     self.valid_moves = []  # Reset valid moves after the move
