@@ -20,13 +20,26 @@ class InputHandler:
             #return
             
         if event.type == pygame.MOUSEBUTTONDOWN and not game.game_over:
-            cell_size = self.renderer.get_cell_size()
-            print(cell_size)
-            board_width = cell_size * self.renderer.cols
-            board_height = cell_size * self.renderer.rows
+            #cell_size = self.renderer.get_cell_size()
+            # print(cell_size)
+            right_margin = 300
+            screen_height = self.renderer.screen.get_height()
+            screen_width = self.renderer.screen.get_width()
 
-            x_offset = (self.renderer.screen.get_width() - board_width) // 2
-            y_offset = (self.renderer.screen.get_height() - board_height) // 2
+            # Calculate available space for the board
+            available_width = screen_width - right_margin
+            available_height = screen_height
+
+            # Calculate cell size to fit within available space
+            cell_width = available_width // self.renderer.cols
+            cell_height = available_height // self.renderer.rows
+            self.cell_size = min(cell_width, cell_height)
+
+            # Calculate offsets for centering the board
+            board_width = self.cell_size * self.renderer.cols
+            board_height = self.cell_size * self.renderer.rows
+            x_offset = (available_width - board_width) // 2
+            y_offset = (screen_height - board_height) // 2
             # board_width = self.renderer.screen.get_width() - x_offset*2
             # board_height = self.renderer.screen.get_height() - x_offset*2
 
@@ -41,7 +54,7 @@ class InputHandler:
             screen_width = self.renderer.screen.get_width()
             print(f"screen_height: {screen_height}")
             print(f"screen_width: {screen_width}")
-            grid_x, grid_y = (y - y_offset) // cell_size, (x - x_offset) // cell_size
+            grid_x, grid_y = (y - y_offset) // self.cell_size, (x - x_offset) // self.cell_size
             print(f"row: {grid_x}")
             print(f"col: {grid_y}")
             clicked_piece = game.board.grid[grid_x][grid_y]
@@ -63,14 +76,14 @@ class InputHandler:
                     print(grid_x)
                     print(grid_y)
                     print("entered movepiece")
-                    game.board.move_piece(self.orig_coords, (grid_x, grid_y))
+                    game.board.move_piece(self.orig_coords, (grid_x, grid_y), game)
                     # game.get_available_pieces_and_moves() # wala na to
                     if game.checkmate():
                         self.checkmate_count += 1 
                     print(f"check_count: {self.checkmate_count}")
                     # Check winner after opponent's turn
                     move_counter = game.get_counter()
-                    if game.checkmate_opp() and self.checkmate_count == 1 and move_counter >= 2:
+                    if game.checkmate_opp() and move_counter >= 2:
                         game.check_winner()
                         print(f"Game over! {game.winner} wins!")
                     else:

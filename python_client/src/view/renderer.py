@@ -6,7 +6,7 @@ from model.piece import Piece
 class Renderer:
     def __init__(self):
         pygame.init()
-        self.screen = pygame.display.set_mode((600, 700), pygame.RESIZABLE)
+        self.screen = pygame.display.set_mode((950, 700), pygame.RESIZABLE)
         pygame.display.set_caption("Dobutsu Shogi")
         self.images = self.load_piece_images()
         self.rows = 8  # Number of rows on the board
@@ -32,10 +32,20 @@ class Renderer:
     def calculate_cell_size(self):
         """Calculate the cell size dynamically based on the window size."""
         screen_width, screen_height = pygame.display.get_window_size()
-        
-        cell_width = screen_width // self.cols
-        cell_height = screen_height // self.rows
+        right_margin = 300
+        screen_height = self.screen.get_height()
+        screen_width = self.screen.get_width()
+
+        # Calculate available space for the board
+        available_width = screen_width - right_margin
+        available_height = screen_height
+
+        # Calculate cell size to fit within available space
+        cell_width = available_width // self.cols
+        cell_height = available_height // self.rows
         self.cell_size = min(cell_width, cell_height)
+
+        return self.cell_size
         # print(screen_width)
         # print(screen_height)
         # print(cell_width)
@@ -52,11 +62,23 @@ class Renderer:
         self.calculate_cell_size()
         self.screen.fill((255, 255, 255))  # Background color
 
+        right_margin = 300
+        screen_width, screen_height = self.screen.get_width(), self.screen.get_height()
+
+        # Calculate available space for the board
+        available_width = screen_width - right_margin
+        available_height = screen_height
+
+        # Calculate cell size to fit within available space
+        cell_width = available_width // self.cols
+        cell_height = available_height // self.rows
+        self.cell_size = min(cell_width, cell_height)
+
+        # Calculate offsets for centering the board
         board_width = self.cell_size * self.cols
         board_height = self.cell_size * self.rows
-
-        x_offset = (self.screen.get_width() - board_width) // 2
-        y_offset = (self.screen.get_height() - board_height) // 2
+        x_offset = (available_width - board_width) // 2
+        y_offset = (screen_height - board_height) // 2
         
 
         for y, row in enumerate(board.grid):
@@ -72,7 +94,7 @@ class Renderer:
 
                 # Highlight valid moves
                 if piece and piece.protected: #lalagyan ko pa ng or opponent.piece.protected
-                    pygame.draw.rect(self.screen, (200, 200, 200), rect, 2)  # Default border for the cell
+                    pygame.draw.rect(self.screen, (255, 0, 0), rect, 2)  # Default border for the cell
                 elif valid_moves and (y, x) in valid_moves:
                     pygame.draw.rect(self.screen, (200, 200, 200), rect, 2)
                     inner_rect = rect.inflate(-4, -4)
@@ -90,10 +112,10 @@ class Renderer:
                             (x * self.cell_size + x_offset + (self.cell_size - image_size) // 2,
                             y * self.cell_size + y_offset + (self.cell_size - image_size) // 2)
                         )
-
+        
+        self.render_captured_pieces(board)
         pygame.display.flip()
 
-    
     def render_winner(self, winner: str):
         """
         Renders a "Player _ wins" message with a semi-transparent white background.
@@ -112,6 +134,76 @@ class Renderer:
         pygame.display.flip()
         #pygame.display.update()
 
+    def render_captured_pieces(self, board):
+        """Render captured pieces beside the main board."""
+        self.calculate_cell_size()
+        cell_size = self.cell_size
+        right_margin = 300
+        screen_width, screen_height = self.screen.get_width(), self.screen.get_height()
+
+        # Calculate available space for the board
+        available_width = screen_width - right_margin
+        available_height = screen_height
+
+        # Calculate cell size to fit within available space
+        cell_width = available_width // self.cols
+        cell_height = available_height // self.rows
+        self.cell_size = min(cell_width, cell_height)
+
+        # Calculate offsets for centering the board
+        board_width = self.cell_size * self.cols
+        board_height = self.cell_size * self.rows
+        x_offset = (available_width - board_width) // 2
+        y_offset = (screen_height - board_height) // 2
+
+        # Define captured pieces area
+        captured_area_start_x = board_width + x_offset + 20  # Right of the board
+        captured_area_start_y = y_offset
+
+        # Calculate maximum pieces per row dynamically
+        max_pieces_per_row = max(3, min(5, (screen_width - captured_area_start_x) // cell_size))
+
+        # Render text for Player 1's captured pieces
+        font = pygame.font.Font(None, cell_size // 3)
+        player1_text = font.render("Captured Pieces (Player 1)", True, (0, 0, 0))  # Black text
+        player1_text_x = captured_area_start_x
+        player1_text_y = captured_area_start_y + 10  # A bit of padding above the pieces
+        self.screen.blit(player1_text, (player1_text_x, player1_text_y))
+
+        # Render Player 1's captured pieces (top-right section)
+        y_offset = player1_text_y + 30  # Add padding below the text
+        for i, piece in enumerate(board.captured_pieces_player1):
+            row = i // max_pieces_per_row
+            col = i % max_pieces_per_row
+            piece_x = captured_area_start_x + col * cell_size
+            piece_y = y_offset + row * cell_size
+
+            image = self.images.get(piece.name)
+            if image:
+                image = pygame.transform.scale(image, (cell_size - 20, cell_size - 20))
+                self.screen.blit(image, (piece_x, piece_y))
+
+        # Render text for Player 2's captured pieces
+        player2_text = font.render("Captured Pieces (Player 2)", True, (0, 0, 0))  # Black text
+        player2_text_x = captured_area_start_x
+        # print(f"cell_size for rendering: {cell_size}")
+        player2_text_y = (cell_size * (self.rows//2)) + y_offset - 25
+        self.screen.blit(player2_text, (player2_text_x, player2_text_y))
+
+        # Render Player 2's captured pieces (below Player 1's section)
+        y_offset = player2_text_y + 30  # Add padding below the text
+        for i, piece in enumerate(board.captured_pieces_player2):
+            row = i // max_pieces_per_row
+            col = i % max_pieces_per_row
+            piece_x = captured_area_start_x + col * cell_size
+            piece_y = y_offset + row * cell_size
+
+            image = self.images.get(piece.name)
+            if image:
+                image = pygame.transform.scale(image, (cell_size - 20, cell_size - 20))
+                self.screen.blit(image, (piece_x, piece_y))
+
+
     def render_play_again_button(self):
         button_width, button_height = 200, 50
         button_x = (self.screen.get_width() - button_width) // 2
@@ -120,7 +212,7 @@ class Renderer:
         self.play_again_button_rect = pygame.Rect(button_x, button_y, button_width, button_height)
         pygame.draw.rect(self.screen, (0, 128, 0), self.play_again_button_rect) 
 
-        font = pygame.font.Font(None, 36)
+        font = pygame.font.Font(None, 30)
         text_surface = font.render("Play Again", True, (255, 255, 255))  
         text_rect = text_surface.get_rect(center=self.play_again_button_rect.center)
         self.screen.blit(text_surface, text_rect)
