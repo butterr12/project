@@ -1,6 +1,7 @@
 from model.piece import Piece, Mime, Goldqueen, Sighducky, Clefairy
 from model.piece_initializer import PieceInitializer
 from copy import deepcopy
+from view.renderer import Renderer
 
 class Board:
     def __init__(self):
@@ -13,6 +14,7 @@ class Board:
         self.captured_positions_player1 = []
         self.captured_positions_player2 = []
         self.moved_piece = False
+        self.renderer = Renderer()
 
     def initialize_pieces(self):
         pieces = self.piece_initializer.initialize_pieces()  # Get pieces and their initial positions
@@ -26,7 +28,7 @@ class Board:
         piece = self.grid[start[0]][start[1]]
         if piece is not None:
             target_piece = self.grid[end[0]][end[1]]
-
+            
             # Simulate the move
             temp_grid = deepcopy(self.grid)
             temp_grid[end[0]][end[1]] = piece
@@ -38,6 +40,11 @@ class Board:
                 if p and p.protected and p.owner == piece.owner
             ]
             opponent_moves = game.get_available_pieces_and_moves_opp()
+            # if self.renderer.render_captured_pieces is not None:
+            #     if target_piece is None and self.drop_captured_piece:
+            #         self.drop_captured_piece()
+            #         self.grid[start[0]][start[1]] = None
+            #         self.moved_piece = True
 
             # Check if any protected piece is threatened
             if piece.protected and end in [move for moves in opponent_moves.values() for move in moves]:
@@ -74,16 +81,18 @@ class Board:
     
     def get_captured_pieces(self, player):
         if player == "Player 1":
+            print("returned player 1")
             return self.captured_pieces_player1
         else:
+            print("returned player 2")
             return self.captured_pieces_player2
         #return []
     
     def get_captured_pieces_position(self, player):
         if player == "Player 1":
-            return self.captured_pieces_player1
+            return self.captured_positions_player1
         else:
-            return self.captured_pieces_player2
+            return self.captured_positions_player2
         #return []
 
     def print_captured_pieces(self):
@@ -96,6 +105,34 @@ class Board:
     
     def move_status(self):
         return self.moved_piece
+
+    def drop_captured_piece(self, player, piece, position, game):
+        """Handles dropping a captured piece onto the board."""
+        x, y = position
+        if self.grid[x][y] is not None:
+            print("Invalid drop: Cell is already occupied.")
+            return False
+
+        # Check if the drop blocks any protected piece's movement
+        opponent_moves = game.get_all_valid_moves_protected_pieces()
+        if position in [move for moves in opponent_moves.values() for move in moves]:
+            print("Invalid drop: Cannot block protected pieces' movement.")
+            return False
+
+        # Drop the piece onto the board
+        self.grid[x][y] = piece
+        piece.owner = player  # Update the ownership of the piece
+
+        # Remove the piece from the captured list
+        if player == "Player 1":
+            self.captured_pieces_player1.remove(piece)
+        else:
+            self.captured_pieces_player2.remove(piece)
+
+        print(f"{player} dropped a piece at {position}.")
+        game.increment_counter()
+        return True
+
 
     # def check_for_winner(self):
         # Check for win conditions

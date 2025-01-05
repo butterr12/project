@@ -136,6 +136,7 @@ class Renderer:
 
     def render_captured_pieces(self, board):
         """Render captured pieces beside the main board."""
+        self.captured_piece_rects = {"Player 1": [], "Player 2": []}
         self.calculate_cell_size()
         cell_size = self.cell_size
         right_margin = 300
@@ -181,7 +182,8 @@ class Renderer:
             image = self.images.get(piece.name)
             if image:
                 image = pygame.transform.scale(image, (cell_size - 20, cell_size - 20))
-                self.screen.blit(image, (piece_x, piece_y))
+                rect = self.screen.blit(image, (piece_x, piece_y))
+                self.captured_piece_rects["Player 1"].append((piece, rect))
 
         # Render text for Player 2's captured pieces
         player2_text = font.render("Captured Pieces (Player 2)", True, (0, 0, 0))  # Black text
@@ -201,8 +203,11 @@ class Renderer:
             image = self.images.get(piece.name)
             if image:
                 image = pygame.transform.scale(image, (cell_size - 20, cell_size - 20))
-                self.screen.blit(image, (piece_x, piece_y))
+                rect = self.screen.blit(image, (piece_x, piece_y))
+                self.captured_piece_rects["Player 2"].append((piece, rect))
 
+        # print(f"captured_rects: {self.captured_piece_rects}")
+        return self.captured_piece_rects
 
     def render_play_again_button(self):
         button_width, button_height = 200, 50

@@ -2,6 +2,7 @@ import pygame
 from model.board import Board
 from model.piece import Piece
 # from model.game import Game
+# from project.python_client.src.model import board
 from view.renderer import Renderer
 
 class InputHandler:
@@ -22,6 +23,9 @@ class InputHandler:
         if event.type == pygame.MOUSEBUTTONDOWN and not game.game_over:
             #cell_size = self.renderer.get_cell_size()
             # print(cell_size)
+
+            
+
             right_margin = 300
             screen_height = self.renderer.screen.get_height()
             screen_width = self.renderer.screen.get_width()
@@ -57,9 +61,76 @@ class InputHandler:
             grid_x, grid_y = (y - y_offset) // self.cell_size, (x - x_offset) // self.cell_size
             print(f"row: {grid_x}")
             print(f"col: {grid_y}")
+
+            grid_x, grid_y = (y - y_offset) // self.cell_size, (x - x_offset) // self.cell_size
+            captured_piece_rects = game.renderer.render_captured_pieces(game.board)
+            print(f"captured_piece_rects: {captured_piece_rects}")
+
+            # Check if the click is outside the board
+            if not (0 <= grid_x < len(game.board.grid) and 0 <= grid_y < len(game.board.grid[0])):
+                # Check if the click is on Player 1's captured pieces
+                mouse_pos = event.pos
+                for piece, rect in captured_piece_rects["Player 1"]:
+                    if rect.collidepoint(mouse_pos):
+                        # Check if the same piece is selected twice
+                        if self.selected_piece == piece:
+                            print(f"Deselected piece: {self.selected_piece.name}")
+                            self.selected_piece = None  # Deselect the piece
+                            self.valid_moves = []  # Clear valid moves
+                            return
+                        else:
+                            if self.selected_piece:  # Reset the previously selected piece
+                                print(f"Deselected piece: {self.selected_piece.name}")
+                            print(f"Player 1 selected {piece.name}")
+                            self.selected_piece = piece
+                            self.valid_moves = []  # Reset valid moves for captured pieces
+                            return
+
+                # Check if the click is on Player 2's captured pieces
+                for piece, rect in captured_piece_rects["Player 2"]:
+                    if rect.collidepoint(mouse_pos):
+                        # Check if the same piece is selected twice
+                        if self.selected_piece == piece:
+                            print(f"Deselected piece: {self.selected_piece.name}")
+                            self.selected_piece = None  # Deselect the piece
+                            self.valid_moves = []  # Clear valid moves
+                            return
+                        else:
+                            if self.selected_piece:  # Reset the previously selected piece
+                                print(f"Deselected piece: {self.selected_piece.name}")
+                            print(f"Player 2 selected {piece.name}")
+                            self.selected_piece = piece
+                            self.valid_moves = []  # Reset valid moves for captured pieces
+                            return
+
+                # If the click is not on the board or captured pieces, do nothing
+                print("Choose within the grid or on captured pieces.")
+                return
+
+            #print(f"selected piece: {self.selected_piece}")
+            #print(f"capytured pieces: {game.board.get_captured_pieces(game.current_player)}")
+            game.board.print_captured_pieces()
+            if self.selected_piece and self.selected_piece in game.board.get_captured_pieces(game.current_player):
+                print("inside")
+                if 0 <= grid_x < len(game.board.grid) and 0 <= grid_y < len(game.board.grid[0]):
+                    success = game.board.drop_captured_piece(game.current_player, self.selected_piece, (grid_x, grid_y), game)
+                    if success:
+                        print(f"{self.selected_piece.name} redeployed to ({grid_x}, {grid_y}).")
+                        self.selected_piece = None
+                        self.valid_moves = []  # Reset valid moves after redeployment
+                        return
+                    else:
+                        print("Redeployment failed.")
+                else:
+                    print("Invalid position for redeployment.")
+                return
+
             clicked_piece = game.board.grid[grid_x][grid_y]
             game.print_all_moves_opp()
             game.checkmate_opp()
+            game.get_all_valid_moves_protected_pieces()
+
+
 
             if clicked_piece and clicked_piece.owner == game.current_player:
                 # reselect new piece if misclicked/change of mind

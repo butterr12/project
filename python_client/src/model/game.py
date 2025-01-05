@@ -161,6 +161,22 @@ class Game:
         else:
             return False
 
+    def get_all_valid_moves_protected_pieces(self):
+        protected_moves = {
+            "Player 1": {},
+            "Player 2": {}
+        }
+        
+        for row in range(len(self.board.grid)):
+            for col in range(len(self.board.grid[row])):
+                piece = self.board.grid[row][col]
+                if piece and piece.protected:
+                    position = (row, col)
+                    valid_moves = piece.valid_moves(position, self.board)
+                    protected_moves[piece.owner][position] = valid_moves
+        print(f"newfuncprotectedmoves: {protected_moves}")            
+        return protected_moves
+
 
     def reset(self):
         self.board = Board() 
