@@ -84,12 +84,7 @@ class InputHandler:
                                 print(f"Deselected piece: {self.selected_piece.name}")
                             print(f"Player 1 selected {piece.name}")
                             self.selected_piece = piece
-                            # self.valid_moves = []
-                            empty_cells = game.get_all_empty_cells()  
-                            invalid_moves = game.board.get_invalid_dropping_points()
-                            print(empty_cells)
-                            print(invalid_moves)
-                            game.renderer.highlight_valid_moves(empty_cells, invalid_moves)
+                            game.renderer.highlight_flag(self.selected_piece, game.board.get_captured_pieces(game.current_player))
                             return
 
                 # Check if the click is on Player 2's captured pieces
@@ -107,12 +102,7 @@ class InputHandler:
                                 print(f"Deselected piece: {self.selected_piece.name}")
                             print(f"Player 2 selected {piece.name}")
                             self.selected_piece = piece
-                            # self.valid_moves = []  # Reset valid moves for captured pieces
-                            empty_cells = game.get_all_empty_cells()
-                            print(empty_cells)
-                            invalid_moves = game.board.get_invalid_dropping_points()
-                            print(invalid_moves)
-                            game.renderer.highlight_valid_moves(empty_cells, invalid_moves)
+                            #game.renderer.highlight_flag()
                             return
 
                 # If the click is not on the board or captured pieces, do nothing
@@ -125,6 +115,7 @@ class InputHandler:
             if self.selected_piece and self.selected_piece in game.board.get_captured_pieces(game.current_player):
                 print("inside")
                 if 0 <= grid_x < len(game.board.grid) and 0 <= grid_y < len(game.board.grid[0]):
+                    #game.renderer.highlight_flag(self.selected_piece,  game.board.get_captured_pieces(game.current_player))
                     success = game.board.drop_captured_piece(game.current_player, self.selected_piece, (grid_x, grid_y), game)
                     if success:
                         print(f"{self.selected_piece.name} redeployed to ({grid_x}, {grid_y}).")

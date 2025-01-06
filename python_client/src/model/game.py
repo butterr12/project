@@ -179,15 +179,6 @@ class Game:
         print(f"newfuncprotectedmoves: {protected_moves}")            
         return protected_moves
 
-    def get_all_empty_cells(self):
-        empty_cells_pos = []
-        for row in range(len(self.board.grid)):
-            for col in range(len(self.board.grid[row])):
-                piece = self.board.grid[row][col]
-                if piece is None:
-                    empty_cells_pos.append((row, col))
-        return empty_cells_pos
-
 
     def reset(self):
         self.board = Board() 

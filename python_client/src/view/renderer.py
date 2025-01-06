@@ -57,7 +57,7 @@ class Renderer:
         self.calculate_cell_size()  # Recalculate before returning, in case the window size changed.
         return self.cell_size
 
-    def render_board(self, board, valid_moves: List[Tuple[int, int]] = None, selected_piece: Piece = None):
+    def render_board(self, board, game, valid_moves: List[Tuple[int, int]] = None, selected_piece: Piece = None):
         """Renders the board with optional highlights for valid moves, centered on the screen."""
         self.calculate_cell_size()
         self.screen.fill((255, 255, 255))  # Background color
@@ -99,6 +99,14 @@ class Renderer:
                     pygame.draw.rect(self.screen, (200, 200, 200), rect, 2)
                     inner_rect = rect.inflate(-4, -4)
                     pygame.draw.rect(self.screen, (0, 255, 0), inner_rect)
+                elif board.get_valid_dropping_points and selected_piece in board.get_captured_pieces(game.current_player):
+                    valid_list = board.get_valid_dropping_points(board.get_all_empty_cells(), board.get_invalid_dropping_points())
+                    if (y, x) in valid_list:
+                        pygame.draw.rect(self.screen, (200, 200, 200), rect, 2)
+                        inner_rect = rect.inflate(-4, -4)
+                        pygame.draw.rect(self.screen, (0, 0, 200), inner_rect)
+                    else:
+                        pygame.draw.rect(self.screen, (200, 200, 200), rect, 2)
                 else:
                     pygame.draw.rect(self.screen, (200, 200, 200), rect, 2)
                 # Draw the piece if present
@@ -114,6 +122,7 @@ class Renderer:
                         )
         
         self.render_captured_pieces(board)
+        #self.render_highlight
         pygame.display.flip()
 
     def render_winner(self, winner: str):
@@ -222,23 +231,8 @@ class Renderer:
         text_rect = text_surface.get_rect(center=self.play_again_button_rect.center)
         self.screen.blit(text_surface, text_rect)
 
-    def highlight_valid_moves(self, all_moves, invalid_moves):
-        for (row, col) in all_moves: # get all empty cells yung all moves
-            if (row, col) not in invalid_moves:  # Highlight only valid moves
-                pygame.draw.rect(
-                    self.screen,
-                    (0, 255, 0),  # Green color for valid moves
-                    pygame.Rect(
-                        col * self.cell_size + self.x_offset,
-                        row * self.cell_size + self.y_offset,
-                        self.cell_size,
-                        self.cell_size
-                    ),
-                    3  # Border thickness
-                )
-        pygame.display.flip()
-
-    def clear_highlights(self):
-        self.render_board(board)  # Re-render the board to clear highlights
-        pygame.display.flip()
-
+    def highlight_flag(self, selected_piece, captured_pieces):
+        if selected_piece and selected_piece in captured_pieces:
+            return True
+        else:
+            return False

@@ -26,7 +26,8 @@ class GameController:
             
             if not self.game.game_over:
                 self.renderer.render_board(
-                    self.game.board,
+                    self.game.board, 
+                    self.game,
                     valid_moves=self.input_handler.valid_moves,  
                     selected_piece=self.input_handler.selected_piece  
                 )
@@ -39,6 +40,7 @@ class GameController:
                 if self.wait_after_game_over:
                     self.renderer.render_board(
                         self.game.board,
+                        self.game,
                         valid_moves=self.input_handler.valid_moves,  
                         selected_piece=self.input_handler.selected_piece  
                     ) # force to show final board state

@@ -81,10 +81,10 @@ class Board:
     
     def get_captured_pieces(self, player):
         if player == "Player 1":
-            print("returned player 1")
+            #print("returned player 1")
             return self.captured_pieces_player1
         else:
-            print("returned player 2")
+            #print("returned player 2")
             return self.captured_pieces_player2
         #return []
     
@@ -142,13 +142,31 @@ class Board:
     def get_invalid_dropping_points(self):
         """Returns the set of invalid dropping points."""
         self.invalid_dropping_points = set()  # Initialize as a set
-        # print(f"self.grid: {self.grid}")
+        #print(f"self.grid: {len(self.grid)}")
         for row in range(len(self.grid)):
             for col in range(len(self.grid[0])):
                 piece = self.grid[row][col]
                 if piece and piece.protected:
                     self.invalid_dropping_points.update(piece.valid_moves((row, col), self))  # Add all valid moves to the set
         return self.invalid_dropping_points
+
+    def get_valid_dropping_points(self, empty_cells, invalid_moves):
+        self.valid_dropping_points = set()
+        for (row, col) in empty_cells: # get all empty cells yung all moves
+            if (row, col) not in invalid_moves:  # Highlight only valid moves
+                self.valid_dropping_points.add((row, col))
+        sorted_valid_points = sorted(self.valid_dropping_points)
+        #print(sorted_valid_points)
+        return sorted_valid_points
+
+    def get_all_empty_cells(self):
+        empty_cells_pos = []
+        for row in range(len(self.grid)):
+            for col in range(len(self.grid[row])):
+                piece = self.grid[row][col]
+                if piece is None:
+                    empty_cells_pos.append((row, col))
+        return empty_cells_pos
 
 
     # def check_for_winner(self):
