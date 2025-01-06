@@ -142,6 +142,22 @@ class Renderer:
         self.screen.blit(text, text_rect)
         pygame.display.flip()
         #pygame.display.update()
+    def render_draw(self):
+        """
+        Renders a "Player _ wins" message with a semi-transparent white background.
+
+        Args:
+            winner (str): The name of the winning player (e.g., "Player 1" or "Player 2").
+        """
+        print(f"Rendering draw")  
+        overlay = pygame.Surface(self.screen.get_size(), pygame.SRCALPHA)
+        overlay.fill((255, 255, 255, 153))
+        font = pygame.font.Font(None, 50)
+        text = font.render(f"Game is draw!", True, (255, 0, 0))
+        text_rect = text.get_rect(center=(self.screen.get_width() // 2, self.screen.get_height() // 2))
+        self.screen.blit(overlay, (0, 0))
+        self.screen.blit(text, text_rect)
+        pygame.display.flip()
 
     def render_captured_pieces(self, board):
         """Render captured pieces beside the main board."""

@@ -47,7 +47,10 @@ class GameController:
                     pygame.display.flip()  
                     self.wait_after_game_over = False
                 elif not self.play_again_button_rendered:
-                    self.renderer.render_winner(self.game.winner)  
+                    if self.game.check_draw():  # Check if the game is a draw
+                        self.renderer.render_draw()  # Render draw visually
+                    elif self.game.winner:  # If there's a winner
+                        self.renderer.render_winner(self.game.winner)
                     self.renderer.render_play_again_button() 
                     self.play_again_button_rendered = True
              

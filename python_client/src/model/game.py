@@ -37,6 +37,15 @@ class Game:
 
             return self.winner
 
+    def check_draw(self):
+        print("entered check_winner")
+        if self.checkmate_opp() and self.checkmate():
+            self.game_over = True
+            print(f"Game is a draw!")
+            return True
+
+        return False
+
         # opponent = "Player 1" if self.current_player == "Player 2" else "Player 2"
         # captured_pieces = self.board.get_captured_pieces(self.current_player)
         # print(self.current_player)

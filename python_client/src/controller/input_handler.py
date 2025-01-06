@@ -10,15 +10,23 @@ class InputHandler:
         self.selected_piece = None
         self.valid_moves = [] 
         self.winner_rendered = False 
+        self.draw_rendered = False
         self.renderer = Renderer()
         self.checkmate_count = 0
 
     def handle_event(self, event, game):
-        if game.game_over and not self.winner_rendered:
-            print(f"Game over! {game.winner} wins!")
-            #self.renderer.render_winner(game.winner)
-            self.winner_rendered = True
-            #return
+        if game.game_over:
+            if game.check_draw():  # Check if the game is a draw
+                if not self.draw_rendered:
+                    print("Game over! It's a draw!")
+                    # self.renderer.render_draw()  # Render a draw visually if implemented
+                    self.draw_rendered = True
+            elif game.winner:  # Check if there's a winner
+                if not self.winner_rendered:
+                    print(f"Game over! {game.winner} wins!")
+                    # self.renderer.render_winner(game.winner)  # Render the winner visually
+                    self.winner_rendered = True
+
             
         if event.type == pygame.MOUSEBUTTONDOWN and not game.game_over:
             #cell_size = self.renderer.get_cell_size()
@@ -84,6 +92,7 @@ class InputHandler:
                                 print(f"Deselected piece: {self.selected_piece.name}")
                             print(f"Player 1 selected {piece.name}")
                             self.selected_piece = piece
+                            #game.renderer.selected_piece_from_controller()
                             game.renderer.highlight_flag(self.selected_piece, game.board.get_captured_pieces(game.current_player))
                             return
 
