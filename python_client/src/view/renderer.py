@@ -13,21 +13,50 @@ class Renderer:
         self.cols = 7
         #self.cell_size = 100
 
+    # def load_piece_images(self):
+    #     """Load images for each piece from the assets folder."""
+    #     assets_path = os.path.join(os.path.dirname(__file__), "assets")
+        
+    #     images = {
+    #         "Charman": pygame.image.load(os.path.join(assets_path, "charman.png")),
+    #         "Clefairy": pygame.image.load(os.path.join(assets_path, "clefairy.png")),
+    #         "Goldqueen": pygame.image.load(os.path.join(assets_path, "goldqueen.png")),
+    #         "Mime": pygame.image.load(os.path.join(assets_path, "mime.png")),
+    #         "Monkey": pygame.image.load(os.path.join(assets_path, "monkey.png")),
+    #         "Sighducky": pygame.image.load(os.path.join(assets_path, "sighducky.png")),
+    #     }
+    #     for key in images:
+    #         images[key] = pygame.transform.scale(images[key], (80, 80))
+    #     return images
+
     def load_piece_images(self):
-        """Load images for each piece from the assets folder."""
+        """Load images for each piece for both players."""
         assets_path = os.path.join(os.path.dirname(__file__), "assets")
         
         images = {
-            "Charman": pygame.image.load(os.path.join(assets_path, "charman.png")),
-            "Clefairy": pygame.image.load(os.path.join(assets_path, "clefairy.png")),
-            "Goldqueen": pygame.image.load(os.path.join(assets_path, "goldqueen.png")),
-            "Mime": pygame.image.load(os.path.join(assets_path, "mime.png")),
-            "Monkey": pygame.image.load(os.path.join(assets_path, "monkey.png")),
-            "Sighducky": pygame.image.load(os.path.join(assets_path, "sighducky.png")),
+            "Player 1": {
+                "Charman": pygame.image.load(os.path.join(assets_path, "player1_charman.png")),
+                "Clefairy": pygame.image.load(os.path.join(assets_path, "player1_clefairy.png")),
+                "Goldqueen": pygame.image.load(os.path.join(assets_path, "player1_goldqueen.png")),
+                "Mime": pygame.image.load(os.path.join(assets_path, "player1_mime.png")),
+                "Monkey": pygame.image.load(os.path.join(assets_path, "player1_monkey.png")),
+                "Sighducky": pygame.image.load(os.path.join(assets_path, "player1_sighducky.png")),
+            },
+            "Player 2": {
+                "Charman": pygame.image.load(os.path.join(assets_path, "player2_charman.png")),
+                "Clefairy": pygame.image.load(os.path.join(assets_path, "player2_clefairy.png")),
+                "Goldqueen": pygame.image.load(os.path.join(assets_path, "player2_goldqueen.png")),
+                "Mime": pygame.image.load(os.path.join(assets_path, "player2_mime.png")),
+                "Monkey": pygame.image.load(os.path.join(assets_path, "player2_monkey.png")),
+                "Sighducky": pygame.image.load(os.path.join(assets_path, "player2_sighducky.png")),
+            }
         }
-        for key in images:
-            images[key] = pygame.transform.scale(images[key], (80, 80))
+        
+        for player, pieces in images.items():
+            for key in pieces:
+                pieces[key] = pygame.transform.scale(pieces[key], (80, 80))
         return images
+
 
     def calculate_cell_size(self):
         """Calculate the cell size dynamically based on the window size."""
@@ -110,8 +139,20 @@ class Renderer:
                 else:
                     pygame.draw.rect(self.screen, (200, 200, 200), rect, 2)
                 # Draw the piece if present
+                # if piece:
+                #     image = self.images.get(piece.name)
+                #     if image:
+                #         image_size = self.cell_size - 20
+                #         image = pygame.transform.scale(image, (image_size, image_size))
+                #         self.screen.blit(
+                #             image,
+                #             (x * self.cell_size + x_offset + (self.cell_size - image_size) // 2,
+                #             y * self.cell_size + y_offset + (self.cell_size - image_size) // 2)
+                #         )
+
                 if piece:
-                    image = self.images.get(piece.name)
+                    player_key = piece.owner  # Example: "Player 1" or "Player 2"
+                    image = self.images[player_key].get(piece.name)
                     if image:
                         image_size = self.cell_size - 20
                         image = pygame.transform.scale(image, (image_size, image_size))
@@ -120,6 +161,7 @@ class Renderer:
                             (x * self.cell_size + x_offset + (self.cell_size - image_size) // 2,
                             y * self.cell_size + y_offset + (self.cell_size - image_size) // 2)
                         )
+
         
         self.render_captured_pieces(board)
         #self.render_highlight
@@ -204,7 +246,7 @@ class Renderer:
             piece_x = captured_area_start_x + col * cell_size
             piece_y = y_offset + row * cell_size
 
-            image = self.images.get(piece.name)
+            image = self.images.get(piece.owner, {}).get(piece.__class__.__name__)
             if image:
                 image = pygame.transform.scale(image, (cell_size - 20, cell_size - 20))
                 rect = self.screen.blit(image, (piece_x, piece_y))
@@ -225,7 +267,7 @@ class Renderer:
             piece_x = captured_area_start_x + col * cell_size
             piece_y = y_offset + row * cell_size
 
-            image = self.images.get(piece.name)
+            image = self.images.get(piece.owner, {}).get(piece.__class__.__name__)
             if image:
                 image = pygame.transform.scale(image, (cell_size - 20, cell_size - 20))
                 rect = self.screen.blit(image, (piece_x, piece_y))
